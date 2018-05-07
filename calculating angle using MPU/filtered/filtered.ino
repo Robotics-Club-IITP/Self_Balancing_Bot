@@ -5,41 +5,34 @@
 
 MPU6050 mpu;
 
-int16_t accY, accZ;
+int16_t accX, accZ;
 float accAngle;
 
-int16_t gyroX, gyroRate;
+int16_t gyroY, gyroRate;
 unsigned long currTime, prevTime=0, loopTime;
 
-const float gain = 0.8;
+const float gain = 0.9;
 float filteredAngle = 0;
 
 void setup() {  
   mpu.initialize();
   Serial.begin(9600);
+  Serial.println("test");
 }
 
 void loop() {  
   float accZ = mpu.getAccelerationZ();
-  float accY = mpu.getAccelerationY();
+  float accX = mpu.getAccelerationX();
 
-  if (!(isnan(accY) || isnan(accZ)))
-    accAngle = atan2(accY, accZ)*RAD_TO_DEG;
-
-  /*
-  if(isnan(accAngle));
-  else {
-    Serial.println(accAngle);
-    delay(10);
-  }*/
+  if (!(isnan(accX) || isnan(accZ)))
+    accAngle = atan2(accZ, accX)*RAD_TO_DEG;
 
   currTime = millis();
   loopTime = currTime - prevTime;
   prevTime = currTime;
   
-  gyroX = mpu.getRotationX();
-  gyroRate = map(gyroX, -32768, 32767, -250, 250);
-  //gyroAngle = gyroAngle + (float)gyroRate*loopTime/1000;
+  gyroY = mpu.getRotationY();
+  gyroRate = map(gyroY, -32768, 32767, -250, 250);
 
   filteredAngle = gain*(filteredAngle + (float)gyroRate*loopTime/1000) + (1-gain)*accAngle;
   
